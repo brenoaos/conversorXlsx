@@ -1,0 +1,30 @@
+########## REQUISITO ###########
+1 - Necessário ter NodeJS, a versão 12 ou superior.
+
+########## Execução ###########
+1 - A instalação criará um arquivo 'config.json' na pasta,
+    raiz do programa. Neste arquito tem duas configurações.
+    => "arquivo" : Nesta configuração deverá se informardo
+                   o caminho absoluto de para o arquivo XLSX
+                   que será analizado pelo programa.
+                   exemplo: 
+                   {
+                       "arquivo: "C:\users\andre\documento\meu.xlsx"
+                   }
+    => "chave" :   Nesta configuração deverá ser informardo os
+                   nomes das colunas do arquivo XLSX, para efeito
+                   de comparação
+                   Exemplo: 
+                   {
+                       "chaves": "chaves":["Loja","DATA_MOVIMENTO","Codigo"]
+                   }   
+    Atenção: No caso de uma ou de todas as configurações não seja
+             feita, o siste considerar as informaçoes iniciais recebidas
+             pelo desenvolvedor desse programa.
+
+2 - Para executar o programa, dê um duplo clique no arquivo 'run' acrescido 
+    do nome do sistema operacional.
+
+3 - Ao fim da Execução, serão criados dois arquivos:
+    Originais.csv => contendo registro unicos.
+    Duplicados.csv => contendo registro que já estão no arquivo Originais.csv
