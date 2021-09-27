@@ -1,112 +1,49 @@
-const xlsxj = require("xlsx-to-json");
-const { readFileSync, existsSync, writeFileSync, unlinkSync, appendFileSync } = require('fs');
-const { randomBytes } = require('crypto');
-const { join, normalize } = require('path')
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
 
-let pathApp = normalize(__dirname + '/../')
-let config;
-let configuracaoPadrao = {
-    arquivo: join(pathApp, '/sample.xlsx'),
-    chaves: ['Loja', 'DATA_MOVIMENTO', 'Codigo', 'NF_CUPOM', 'VALOR', 'Cnpj']
+// Handle creating/removing shortcuts on Windows when installing/uninstalling.
+if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
+  app.quit();
+}
+
+const createWindow = () => {
+  // Create the browser window.
+  const mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  });
+
+  // and load the index.html of the app.
+  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+
+  // Open the DevTools.
+  // mainWindow.webContents.openDevTools();
 };
-let chavesLidas = [];
-let fileTmp = 'tmp-' + randomBytes(5).toString('hex');
-let originais = {};
-let duplicados = {};
 
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app.on('ready', createWindow);
 
-const init = (res, rej) => {
-    try {
-        config = JSON.parse(readFileSync(join(pathApp, '/config.json'), 'utf-8'))
-    } catch (err) {
-        config = configuracaoPadrao
-        writeFileSync(join(pathApp, '/config.json'), JSON.stringify(configuracaoPadrao), 'utf-8')
-    }
+// Quit when all windows are closed.
+app.on('window-all-closed', () => {
+  // On OS X it is common for applications and their menu bar
+  // to stay active until the user quits explicitly with Cmd + Q
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
 
-    if (!config.arquivo) {
-        config.arquivo = configuracaoPadrao.arquivo;
-    }
+app.on('activate', () => {
+  // On OS X it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
+});
 
-    if (!existsSync(config.arquivo)) {
-        return rej(new Error('Arquivo de configuração não encontrado.'));
-    }
-
-    if (!config.chaves || config.chaves.length === 0) {
-        config.chaves = configuracaoPadrao.chaves;
-    }
-
-    for (let i = 0; i < config.chaves.length; i++) {
-        config.chaves[i] = config.chaves[i].toUpperCase();
-    }
-
-    return res({ res, rej });
-}
-
-const parseXlsxToJson = (promise, result) => {
-
-    xlsxj({
-        input: config.arquivo,
-        output: fileTmp
-    }, (err, result) => separaRegistros(err, result, promise));
-
-}
-
-const separaRegistros = (err, result, promise) => {
-    unlinkSync(fileTmp)
-    if (err) throw err
-
-    let key = ''
-
-    if (existsSync('duplicados.csv')) unlinkSync('duplicados.csv');
-    if (existsSync('originais.csv')) unlinkSync('originais.csv');
-
-    let cabecalho = { originais: false, duplicados: false }
-
-    for (let dado of result) {
-        for (let chave of config.chaves) {
-            key += dado[chave].trim()
-        }
-
-        if (chavesLidas.indexOf(key) > -1) {
-            let fileName = 'duplicados.csv'
-
-            if (!cabecalho.duplicados) {
-                escreveCsv(fileName, dado, true)
-                cabecalho.duplicados = true
-            }
-
-            escreveCsv(fileName, dado)
-
-        } else {
-            let fileName = 'originais.csv';
-
-            chavesLidas.push(key);
-
-            if (!cabecalho.originais) {
-                escreveCsv(fileName, dado, true)
-                cabecalho.originais = true
-            }
-
-            escreveCsv(fileName, dado)
-        }
-        key = '';
-    }
-    promise.res()
-}
-
-const escreveCsv = (file, obj, cabecalho = false) => {
-    let data = ""
-    for (let attr in obj) {
-        data += cabecalho ? attr : obj[attr];
-        data += ';'
-    }
-    appendFileSync(file, data + '\r\n')
-}
-
-
-const programa = new Promise(init)
-    .then(parseXlsxToJson)
-    .finally(() => {
-
-    })
-    .catch(err => console.log(err.message));
+// In this file you can include the rest of your app's specific main process
+// code. You can also put them in separate files and import them here.
