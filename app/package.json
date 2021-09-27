@@ -3,7 +3,7 @@
   "productName": "conversorXlsx",
   "version": "1.0.0",
   "description": "My Electron application description",
-  "main": "src/index.js",
+  "main": "main.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
@@ -42,6 +42,7 @@
     }
   },
   "dependencies": {
+    "convert-excel-to-json": "^1.7.0",
     "electron-squirrel-startup": "^1.0.0"
   },
   "devDependencies": {
@@ -52,7 +53,6 @@
     "@electron-forge/maker-zip": "^6.0.0-beta.50",
     "devtron": "^1.4.0",
     "electron": "8.0.2",
-    "electron-builder": "^22.11.7",
-    "xlsx-to-json": "^0.3.0"
+    "electron-builder": "^22.11.7"
   }
 }

@@ -1,7 +1,8 @@
+'use strict';
 const { readFileSync, existsSync, writeFileSync, unlinkSync, appendFileSync } = require('fs');
 const { randomBytes } = require('crypto');
 const { join, normalize } = require('path')
-const xlsxj = require("xlsx-to-json");
+const excelToJson = require('convert-excel-to-json');
 
 var btnCarregar = document.getElementById("btnCarregar");
 var btnDepurar = document.getElementById("btnDepurar");
@@ -95,39 +96,52 @@ function carregarArquivo() {
 
   arquivo = iptArquivo.files[0].path;
 
-  xlsxj({
-    input: arquivo,
-    output: fileTmp
-  }, (err, result) => {
-    chaves = Object.keys(result[0]);
+  var result = excelToJson({ sourceFile: arquivo })
 
-    for (let chave of chaves) {
-      if (!chave) continue;
-      var label = document.createElement('label')
-      var check = document.createElement('input')
-      var div = document.createElement('div')
+  result = result[Object.keys(result)[0]];
 
-      check.type = 'checkbox';
-      check.id = chave.toLowerCase();
-      check.classList = ['form-check-input'];
+  chaves = result.shift();
 
-      label.innerHTML = chave;
-      label.classList = ['form-check-label'];
-      label.htmlFor = chave.toLowerCase();
+  var novoJson = {}
 
-      div.classList = ['form-check'];
-      div.appendChild(label);
-      div.appendChild(check);
+  for (let row of result) {
 
-      divChaves.appendChild(div);
+    for (let attr in row) {
+
+      novoJson[chaves[attr]] = row[attr]
 
     }
 
-    alert("Arquivo de entrada Carregado com sucesso.\nSelecione os atributos.");
-  })
+  }
+
+  writeFileSync(fileTmp, JSON.stringify(novoJson))
+
+
+  for (let chave of Object.values(chaves)) {
+    if (!chave) continue;
+    var label = document.createElement('label')
+    var check = document.createElement('input')
+    var div = document.createElement('div')
+
+    check.type = 'checkbox';
+    check.id = chave.toLowerCase();
+    check.classList = ['form-check-input'];
+
+    label.innerHTML = chave;
+    label.classList = ['form-check-label'];
+    label.htmlFor = chave.toLowerCase();
+
+    div.classList = ['form-check'];
+    div.appendChild(label);
+    div.appendChild(check);
+
+    divChaves.appendChild(div);
+
+  }
+
+  alert("Arquivo de entrada Carregado com sucesso.\nSelecione os atributos.");
 
 }
-
 
 const escreveCsv = (file, obj, cabecalho = false) => {
   let data = ""
