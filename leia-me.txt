@@ -1,5 +1,5 @@
 ########## REQUISITO ###########
-1 - Necessário ter NodeJS, a versão 12 ou superior.
+1 - Necessário ter NodeJS, a versão 12 ou superior.  ==> https://nodejs.org/en/download/
 
 ########## Execução ###########
 1 - A instalação criará um arquivo 'config.json' na pasta,
