@@ -1,3 +1,4 @@
-app/node_modules
 duplicados.csv
 originais.csv
+app/out/
+app/node_modules/

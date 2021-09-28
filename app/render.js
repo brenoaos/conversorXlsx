@@ -13,6 +13,7 @@ var fileTmp = 'tmp-' + randomBytes(5).toString('hex');
 var divChaves = document.getElementById("chaves");
 var loader = document.getElementById("loader");
 var downloads = document.getElementById("downloadsArea")
+var statusSistema = document.getElementById("statusSistema");
 
 var arquivo = '';
 var chaves = [];
@@ -20,6 +21,12 @@ var chavesSelecionadas = [];
 var chavesLidas = [];
 
 var chavePadrao = ['LOJA', 'DATA_MOVIMENTO', 'CODIGO', 'NF_CUPOM', 'VALOR', 'CNPJ']
+
+var mensagem = (texto) => {
+
+  statusSistema.innerHTML = texto;
+
+}
 
 function init() {
 
@@ -40,18 +47,18 @@ function depurarArquivo() {
   var key = '';
 
   if (!existsSync(fileTmp)) {
-    alert("Carregue o arquivo antes de depurar");
+    mensagem("Carregue o arquivo antes de depurar");
     return
   }
 
-  alert("Idenficando chaves selecionadas...");
+  mensagem("Idenficando chaves selecionadas...");
 
   for (let elem of divChaves.children) {
     if (elem.children[1].checked) chavesSelecionadas.push(elem.children[1].id.toUpperCase())
   }
 
   if (chavesSelecionadas.length === 0) {
-    alert('Nehuma coluna selecionada.');
+    mensagem('Nehuma coluna selecionada.');
     return;
   }
 
@@ -61,7 +68,7 @@ function depurarArquivo() {
   let cabecalho = { originais: false, duplicados: false }
   let result = JSON.parse(readFileSync(fileTmp, 'utf-8'));
 
-  alert("Depurando o arquivo.\nPor favor, aguarde!!");
+  mensagem("Depurando o arquivo.\nPor favor, aguarde!!");
 
   for (let dado of result) {
     key = "";
@@ -101,14 +108,14 @@ function depurarArquivo() {
   }
 
   unlinkSync(fileTmp);
-  alert("Depuração concluída com sucesso!!!");
+  mensagem("Depuração concluída com sucesso!!!");
   downloads.style = 'block';
 }
 
 function carregarArquivo() {
 
   if (iptArquivo.value === "") {
-    alert('Nenhum arquivo informado');
+    mensagem('Nenhum arquivo informado');
     return
   }
 
@@ -116,7 +123,7 @@ function carregarArquivo() {
     for (let ch of divChaves.children) divChaves.removeChild(ch)
   }
 
-  alert("Carregando arquivo de entrada.\nPor favor, aguarde!");
+  mensagem("Carregando arquivo de entrada.\nPor favor, aguarde!");
 
   init();
 
@@ -169,7 +176,7 @@ function carregarArquivo() {
 
   }
 
-  alert("Arquivo de entrada carregado com sucesso.\nSelecione os atributos.");
+  mensagem("Arquivo de entrada carregado com sucesso.\nSelecione os atributos.");
   btnDepurar.style = 'block';
 }
 
